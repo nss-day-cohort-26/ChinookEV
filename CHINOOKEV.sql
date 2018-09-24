@@ -33,10 +33,16 @@ SELECT BillingCountry FROM Invoice;
 
 -- Provide a query that shows the Invoice Total, Customer name, Country and Sale Agent name for all invoices and customers.
 
-SELECT i.Total, c.FirstName, c.LastName, c.Country, e.FirstName, e.lastName
+SELECT distinct 
+	i.Total,
+	CONCAT(c.FirstName, ' ' ,c.LastName) AS CustomerName,
+	c.Country,
+	CONCAT (e.FirstName, ' ',e.LastName) AS SaleAgentName,
+	e.title
 FROM Invoice i 
 LEFT JOIN Customer c ON i.customerId = c.customerId
-LEFT JOIN Employee e ON e.employeeId = i.customerId;
+LEFT JOIN Employee e ON e.employeeId = i.customerId
+WHERE e.title = 'Sales Support Agent';
 
 -- How many Invoices were there in 2009 and 2011?
 
@@ -59,25 +65,77 @@ WHERE InvoiceDate
 Between '2010-01-01' AND '2011-01-01'
 
 
---invoice_37_line_item_count.sql: Looking at the InvoiceLine table, provide a query that COUNTs the number of line items for Invoice ID 37.
+--Looking at the InvoiceLine table, provide a query that COUNTs the number of line items for Invoice ID 37.
 
---line_items_per_invoice.sql: Looking at the InvoiceLine table, provide a query that COUNTs the number of line items for each Invoice. HINT: GROUP BY
+SELECT COUNT(*) FROM InvoiceLine 
+WHERE InvoiceId = 37;
 
---line_item_track.sql: Provide a query that includes the purchased track name with each invoice line item.
+--Looking at the InvoiceLine table, provide a query that COUNTs the number of line items for each Invoice. HINT: GROUP BY
 
---line_item_track_artist.sql: Provide a query that includes the purchased track name AND artist name with each invoice line item.
+SELECT COUNT(*) FROM InvoiceLine
+GROUP BY InvoiceId;
 
---country_invoices.sql: Provide a query that shows the # of invoices per country. HINT: GROUP BY
+-- Provide a query that includes the purchased track name with each invoice line item.
+SELECT t.Name, il.invoiceId
+FROM Track t  
+LEFT JOIN InvoiceLine il ON t.TrackId = il.InvoiceId;
 
---playlists_track_count.sql: Provide a query that shows the total number of tracks in each playlist. The Playlist name should be include on the resulant table.
+--Provide a query that includes the purchased track name AND artist name with each invoice line item.
 
---tracks_no_id.sql: Provide a query that shows all the Tracks, but displays no IDs. The result should include the Album name, Media type and Genre.
+--SELECT 
+--	t.Name,
+--	a.Name
+--FROM Track t, Artist a
+	
 
---invoices_line_item_count.sql: Provide a query that shows all Invoices but includes the # of invoice line items.
 
---sales_agent_total_sales.sql: Provide a query that shows total sales made by each sales agent.
+-- Provide a query that shows the # of invoices per country. HINT: GROUP BY
 
---top_2009_agent.sql: Which sales agent made the most in sales in 2009?
+SELECT COUNT(i.InvoiceDate) AS Invoices,
+			 i.BillingCountry
+FROM Invoice i
+GROUP BY i.BillingCountry;
+
+--Provide a query that shows the total number of tracks in each playlist. The Playlist name should be include on the resulant table.
+
+--SELECT COUNT(pt.TrackId) AS TotalNumberOfTracks,
+--	p.Name
+--	FROM PlaylistTrack pt
+--	JOIN Playlist p ON 
+--	GROUP BY pt.TrackId;
+
+-- Provide a query that shows all the Tracks, but displays no IDs. The result should include the Album name, Media type and Genre
+
+SELECT 
+	a.Title,
+	m.Name,
+	g.Name
+FROM Album a, MediaType m, Genre g;
+	
+
+--Provide a query that shows all Invoices but includes the # of invoice line items.
+
+
+
+--Provide a query that shows total sales made by each sales agent.
+
+	SELECT
+		COUNT(i.Total) AS TotalSales,
+		e.Title,
+		CONCAT(e.FirstName, ' ', e.LastName) AS SalesAgentName
+	FROM Invoice i, Employee e
+	WHERE Title = 'Sales Support Agent'
+	GROUP BY e.FirstName,e.LastName,e.Title;
+
+--Which sales agent made the most in sales in 2009?
+
+	--SELECT
+	--	max(i.Total) TotalSales,
+	--	CONCAT (e.FirstName, ' ', e.LastName) AS EmployeeName
+	--FROM Invoice i, Employee e
+	--WHERE i.InvoiceDate = '2009'
+	--GROUP BY e.Firstname, e.LastName;
+	
 
 --Hint: Use the MAX function on a subquery.
 
